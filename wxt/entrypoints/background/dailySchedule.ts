@@ -6,6 +6,7 @@ import { DEFAULTS } from '@/entrypoints/utils/settings';
 import { setBadgeText } from '@/entrypoints/utils/browserAction';
 import { openDailyRewards } from './dailyRewards';
 import { startSearches } from './searchRunner';
+import { runVisualSearch } from './visualSearch';
 
 const WEBSITE_URL = 'https://svitspindler.com/microsoft-automatic-rewards';
 
@@ -15,16 +16,26 @@ const WEBSITE_URL = 'https://svitspindler.com/microsoft-automatic-rewards';
 // "Get rewards" button call this, so the button respects the same toggles
 // rather than forcing searches.
 export async function runRewards(): Promise<void> {
-    const s = await getStorageItems(['searches', 'timeout', 'closeTime', 'autoDaily', 'active'], StorageValues.SYNC);
+    const s = await getStorageItems(['searches', 'timeout', 'closeTime', 'autoDaily', 'active', 'dailyVisualSearch', 'lastVisualSearch'], StorageValues.SYNC);
     const searchTimeout = toInt(s.timeout, DEFAULTS.timeout);
     const searches = toInt(s.searches, DEFAULTS.searches);
     const closeTime = toInt(s.closeTime, DEFAULTS.closeTime);
     const autoDaily = s.autoDaily ?? DEFAULTS.autoDaily;
     const autoTabs = s.active ?? DEFAULTS.active;
+    const dailyVisualSearch = s.dailyVisualSearch ?? DEFAULTS.dailyVisualSearch;
 
     if (autoDaily) await openDailyRewards();
     if (autoTabs && searches > 0) {
         await startSearches(searchTimeout, searches, closeTime);
+    }
+    // Guard on its own date so it runs at most once a day even when the popup
+    // "Get rewards" button re-invokes runRewards.
+    if (dailyVisualSearch) {
+        const today = new Date().toLocaleDateString();
+        if (s.lastVisualSearch !== today) {
+            await runVisualSearch();
+            await setStorageItem('lastVisualSearch', today, StorageValues.SYNC);
+        }
     }
 }
 
@@ -46,6 +57,8 @@ export async function handleInstallOrUpdate(details: { reason: string }): Promis
             timeout: DEFAULTS.timeout,
             searches: DEFAULTS.searches,
             closeTime: DEFAULTS.closeTime,
+            openFirstResult: DEFAULTS.openFirstResult,
+            dailyVisualSearch: DEFAULTS.dailyVisualSearch,
             isSearching: false,
         }, StorageValues.SYNC);
         await browser.runtime.setUninstallURL(

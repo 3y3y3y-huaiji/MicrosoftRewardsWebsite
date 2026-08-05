@@ -7,6 +7,12 @@ export const DEFAULTS = {
     timeout: 60,
     searches: 5,
     closeTime: 5,
+    // When on, each search tab opens its first organic result after a short
+    // random delay (without stealing focus); otherwise the tab just loads the SERP.
+    openFirstResult: true,
+    // Off by default: once a day, drive a Bing visual search to complete that
+    // Rewards activity. A more unusual automated pattern, so opt-in only.
+    dailyVisualSearch: false,
 } as const;
 
 // Selecting an account level sets a sensible default number of daily searches
