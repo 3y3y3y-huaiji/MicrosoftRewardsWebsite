@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { StorageValues } from "@/entrypoints/enums/storageValues";
 import { storage } from '#imports';
-import { StorageItem } from "@/entrypoints/types/storageItem";
+import type { StorageItem } from "@/entrypoints/types/storageItem";
 
 // Matches WXT's branded storage-key type. StorageValues values are exactly
 // local/session/sync/managed, so the runtime string always satisfies this shape.
@@ -51,7 +51,9 @@ export async function getStorageItems<T = unknown>(keys: string[], storageType: 
     const items = await storage.getItems(storageKeys);
     return items.reduce((acc: Record<string, T>, item: StorageItem) => {
         const shortKey = item.key.split(":")[1];
-        acc[shortKey] = item.value as T;
+        if (shortKey !== undefined) {
+            acc[shortKey] = item.value as T;
+        }
         return acc;
     }, {});
 }
