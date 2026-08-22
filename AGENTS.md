@@ -4,7 +4,7 @@
 
 ## 0. 商用红线（必读）
 
-- **上游 `spin311/MicrosoftRewardsWebsite` 无 License**（`upstream` remote 已验证可 `git fetch`），代码版权归原作者。**禁止**直接复制上游代码去商用，必须**全新重实现/重构**（clean-room）。
+- **上游 `spin311/MicrosoftRewardsWebsite` 无 License**，代码版权归原作者，**已断开 `upstream` remote**（`2026-08-23 git remote remove upstream`）。**禁止**直接复制上游代码去商用，必须**全新重实现/重构**（clean-room）。
 - 本仓库 `origin` 为 `3y3y3y-huaiji/Microsoft-Rewards-AutoSearch`，**全新重构部分以木兰宽松许可证 v2（Mulan PSL v2，SPDX: MulanPSL-2.0，`LICENSE`）开源**，支持商用；历史汉化文本曾以 `CC BY 4.0` 共享，现统一为 MulanPSL-2.0。上游无 License 的代码仍归原作者，不在本仓库主张权利。
 - 本次目标产物是 **Chromium MV3 插件**（`wxt`），`microsoft_rewards_app`（Flutter）与历史 `chrome/`/`firefox/` 目录已废弃，重构时**不要**回迁旧代码。
 
@@ -14,7 +14,7 @@
 - 双包结构：`wxt/`（插件，重点）与 `microsoft_rewards_app/`（Flutter 3.7+，`1.2.0+14`，与插件无共享代码）。插件改动不要碰 Flutter，反之亦然。
 - 工作树极脏：`git status` 显示 300+ 未跟踪文件（`.agents/*` 为历史 AI 流水、`builds/` 为本机构建产物、`wxt/entrypoints/i18n/` 为新增未提交的 i18n 实现、`PROJECT.md`/`ORIGINAL_REQUEST.md` 为临时任务文档）。执行下一步重构前先做**文件夹整理**并把 `.agents/`、`builds/` 加入 `.gitignore`。
 - `wxt/dist/`、`.wxt/`、`node_modules/` 已忽略；根 `.gitignore` 尚缺 `.agents/` 与 `builds/`。
-- GitHub 连通性：`git fetch origin` / `git fetch upstream` 已验证可用（`2026-08-22` 成功拉取 `upstream/master` 新分支）。`gh` CLI 本机未安装，用 `git` 同步即可。如后续 `fetch` 失败，先告知用户再继续。
+- GitHub 连通性：`git fetch origin` 已验证可用（`2026-08-23` 已断开 `upstream`；如需再拉上游需重新 `git remote add upstream https://github.com/spin311/MicrosoftRewardsWebsite.git`）。`gh` CLI 本机未安装，用 `git` 同步即可。如后续 `fetch` 失败，先告知用户再继续。
 
 ## 2. 关键命令（必须在 `wxt/` 下执行）
 
@@ -45,7 +45,7 @@ npm run dev:firefox    # Firefox 调试
 
 ## 4. Git 与多进度工作流（用户已要求）
 
-- **Remotes**：`origin`（可推）与 `upstream`（只读上游）。不要把 `upstream` 误推。
+- **Remotes**：仅 `origin`（已断开 `upstream`）；如需对比上游需手动重加 `upstream`，勿推错。
 - **分支**：`master`（主线）、`safe-zh-cn`（零破坏汉化）、`dev`（WXT 0.21 升级线）、`add-mit-license`。重构新工作应在**新建**分支/工作树上进行。
 - **工作树**：已在仓库内 `.worktrees/` 下创建 3 个并行工作树（`git worktree list` 可见）：
   ```bash
